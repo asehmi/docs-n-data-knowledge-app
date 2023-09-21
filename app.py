@@ -10,7 +10,7 @@ st.set_page_config(page_title='ChatGPT Pandas CSV Streamlit App', page_icon='�
 from app_state import (state, init_app_state, reset_app_state, _set_state_cb)
 init_app_state() # ensure all state variables are initialized
 
-import app_llm_data_query, app_llm_docs_query, app_llm_knowlege_graph_gen
+import app_llm_data_query, app_llm_docs_query, app_llm_knowlege_graph_gen, app_about
 
 from globals import SAMPLE_QUESTIONS
 
@@ -61,7 +61,7 @@ def start():
     # Sidebar
     with st.sidebar:
         st.image('./images/a12i_logo_circle_transparent.png')
-        top_level_options = ['Document Q&A | Knowedge Graph', 'Data Chat']
+        top_level_options = ['Document Q&A | Knowedge Graph', 'Data Chat', 'About']
         st.subheader('What would you like to do?')
         top_level = st.radio(
             'What would you like to do?', 
@@ -74,7 +74,7 @@ def start():
         c1, _ = st.columns([1, 1.5])
         with c1:
             # Title and description
-            st.subheader(f'Document Q&A ❣️ Knowledge Graph')
+            st.subheader('Document Q&A ❣️ Knowledge Graph')
             st.caption(
                 '📑 Ask a question based on pre-uploaded documents on the subject of **Software Architecture**. You can ask questions on any topic '
                 'in as much detail as you like. For your convenience, some sample questions are provided below.'
@@ -123,7 +123,7 @@ def start():
         
         st.markdown('---')
 
-        c1, _, c3 = st.columns([1, 0.075, 1])
+        c1, _, c3 = st.columns([1.5, 0.25, 1])
         with c1:
             response = app_llm_docs_query.main('Document Q&A', user_input_confirmed)
         with c3:
@@ -133,8 +133,13 @@ def start():
     if top_level == top_level_options[1]:
         c1, _ = st.columns([1, 2])
         with c1:
-            st.subheader(f'🔢 Simple Excel Data Q&A')
+            st.subheader('🔢 Simple Excel Data Q&A')
             app_llm_data_query.main('Data Chat')
+            
+    # About / Display README.md
+    if top_level == top_level_options[2]:
+        st.subheader('📖 Readme')
+        app_about.main()
 
     with st.sidebar:
         st.markdown('---')
@@ -157,6 +162,10 @@ def start():
         with st.expander('Debug State (excluding private keys)', expanded=False):
             display_state = {k: v for k, v in state.items() if not ('openai' in k or 'weaviate' in k)}
             st.write(display_state)
+
+        st.subheader('About')
+        st.sidebar.info('Integrated LLM-based document and data Q&A with knowledge graph visualization.\n\n' + \
+            '(c) 2023. A12i (CloudOpti Ltd.) All rights reserved.')
 
 if __name__ == '__main__':
     start()

@@ -13,54 +13,6 @@
             "args": []
         },
         {
-            "name": "[MODEL API] Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "args": ["runapi", "--reload", "--deployment-key", "local", "--deployment-instance", "0"]
-        },
-        {
-            "name": "[TUNER API] Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "args": ["runapi", "--reload", "--host", "localhost", "--port", "8001"]
-        },
-        {
-            "name": "[MODEL CLI BUILD] Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "args": ["runmodel", "UNI", "--build", "--no-predict", "--no-include-signals"]
-        },
-        {
-            "name": "[MODEL CLI PREDICT] Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "args": ["runmodel", "UNI", "--no-build", "--predict", "--no-include-signals"]
-        },
-        {
-            "name": "[MODEL CLI SIGNALS] Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "args": ["runmodel", "UNI", "--no-build", "--predict", "--include-signals"]
-        },
-        {
-            "name": "[TUNER CLI] Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "args": ["runonce", "AVAX"]
-        },
-        {
             "name": "Python: debugpy Remote Attach",
             "type": "python",
             "request": "attach",

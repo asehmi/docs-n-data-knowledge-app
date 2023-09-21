@@ -77,7 +77,9 @@ def main(title, user_input_confirmed=False):
         documents = SimpleDirectoryReader('docs').load_data()
 
         # LOCAL STORE
-        if VECTOR_STORE == 'Local':
+        # NOTE: Disallow if cloud deployment (temporary fix for public demo and/or if you 
+        # don't have required file permissions or disk space)
+        if not json.loads(st.secrets['IS_CLOUD_DEPLOYMENT']) and VECTOR_STORE == 'Local':
             # construct an index over these documents... saved in memory
             index = VectorStoreIndex.from_documents(documents, show_progress=True, service_context=service_context)
             # save index on disk
@@ -114,6 +116,7 @@ def main(title, user_input_confirmed=False):
         if st.button('Clear history'):
             state.questions = []
             state.past = []
+        # NOTE: Hide indexing button if cloud deployment (temporary fix for public demo)
         if not json.loads(st.secrets['IS_CLOUD_DEPLOYMENT']) and st.button('Index documents'):
             with st.spinner("Indexing..."):
                 _index_documents()

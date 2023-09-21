@@ -10,11 +10,11 @@
 
 ### Introduction
 
-I'm writing some chapters for an upcoming book on Streamlit. So, I built this app to help me digest a large quantity of information from articles and documents I had on the subject of Software Architecture. I wanted to be able to ask questions about the documents and get answers, and also to be able to visualize the answers in a knowledge graph. I also wanted to be able to upload an Excel file and ask questions about the data in the file.
+I built this app because I'm writing some chapters for an upcoming book on Streamlit. This app helps me digest a large quantity of information from articles and documents I have on the subject of Software Architecture. I wanted to be able to ask questions about the documents and get answers, and also to visualize the answers in a knowledge graph. I also wanted to upload Excel files and ask questions about the data in the files.
 
-The application is a typical LLM application, with the addition of a knowledge graph visualization (implemented using Streamlit custom components). The application is built in Python using Streamlit and uses the Weaviate vector store for document and data indexing, and it uses the LangChain and Llama-Index LLM programming frameworks. The application supports local filestore indexding too. OpenAI embeddings are used and the OpenAI API is called for question answering (hence you will need an OpenAI API key to use the application). Various LLM models are used for the question answering, including the GPT-3.5 Turbo and GPT-4 models (both chat and completions variants). Token usage is tracked and costs are estimated.
+The application is a typical LLM application, with the addition of a knowledge graph visualization. The app is built in Python using StreamlitI. I was inspired by [instagraph](https://github.com/yoheinakajima/instagraph) and re-implemented its graph plot as a Streamlit custom component. I use the Weaviate Cloud (vector) Store (WCS) for document and data indexing. OpenAI, LangChain, and LlamaIndex LLM programming frameworks play an important role too. The application supports local filestore indexing in addition to WCS. OpenAI embeddings are used and the OpenAI API is called, directly or via the other LLM frameworks, for question answering. Hence, you will need an OpenAI API key to use the application. Various LLM models are used for question answering, including the GPT-3.5 Turbo and GPT-4 models. Both their chat and completions variants are used. Token usage is tracked and costs are estimated.
 
-The application is deployed on Streamlit Cloud. In the cloud, the application uses the Weaviate cloud-based vector store. Locally, the application uses a local filestore for indexing.
+The application is deployed on Streamlit Cloud. When deployed in the cloud, the application uses WCS. When deployed locally, the application can be configured to use LlamaIndex to store its index in the local file system.
 
 ![snapshot](./images/snapshot-01.png)
 
@@ -22,10 +22,10 @@ The application is deployed on Streamlit Cloud. In the cloud, the application us
 
 In this demo:
 
-1. The user selects or enters a question query over documents or data which have been indexed into Weaviate (a cloud-based vector store) 
+1. The user selects or enters a question to query over documents or data which have been indexed into Weaviate (a cloud-based vector store) 
 2. The app displays the question answer and generates a knowledge graph to complement the answer
-3. The user can also upload an Excel file which can be displayed an queried using natural language
-4. The app allows the user to enter their OpenAI API key and select the model(s) to use for the question answering
+3. The user can upload an Excel file which can be displayed and queried using natural language
+4. The app allows the user to enter their OpenAI API key and select the model(s) to use for question answering
 5. The app displays a per-query cost estimate and a running total of the cost of the queries
 
 ![st_demo](./images/app-demo.gif)
@@ -57,7 +57,7 @@ WEAVIATE_API_KEY='<Your Weaviate API Key>'
 WEAVIATE_CLUSTER_URL='https://<Your Weaviate Cluster ID>.weaviate.network'
 ```
 
-In `globals.py` you can change the following to affects the application behaviour:
+In `globals.py` you can change the following variables to affect application behaviour:
 
 ```python
 LANG_MODEL_PRICING = {
@@ -88,21 +88,9 @@ streamlit run --server.port 4010 app.py
 ```
 
 ### TODO
-- Need to have both completions and chat model selectors, indicating which model is for which purpose
-- Possibly, remove the data page functionality from app and create a separate project for it
-- Implement a file upload for the doc page and enable indexing of a local folder only if the app is run locally
-- Add an is_local_deployment flag to the app secrets
 
-### Resources
-- https://weaviate.io/blog/llamaindex-and-weaviate
-- https://weaviate.io/developers/weaviate
-- https://console.weaviate.cloud/dashboard
-- https://github.com/weaviate/recipes/tree/main
-- https://github.com/weaviate/recipes/tree/main/integrations/llamaindex
-- https://twitter.com/weaviate_io
-- https://llmstack.ai/blog/retrieval-augmented-generation
-- https://community.openai.com/t/how-to-accurately-price-a-gpt-4-chatbot/347250/23
-- https://platform.openai.com/docs/deprecations/
+- Possibly, remove the data page functionality from app and create a separate project for it
+- Implement file upload document Q&A
 
 ---
 

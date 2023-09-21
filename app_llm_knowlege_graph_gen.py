@@ -1,4 +1,5 @@
 import json
+import re
 import openai
 from graphviz import Digraph
 import base64
@@ -16,6 +17,18 @@ from app_state import (state, _set_state_cb, init_app_state, reset_app_state)
 init_app_state() # ensure all state variables are initialized
 
 # GRAPH GENERATOR -------------------------------------------------------------
+
+def correct_json(response_data):
+    """
+    Corrects the JSON response from OpenAI to be valid JSON
+    """
+    response_data = re.sub(
+        r',\s*}', '}', re.sub(
+        r',\s*]', ']', re.sub(
+        r'(\w+)\s*:', r'"\1":', 
+        response_data
+    )))
+    return response_data
 
 @st.cache_data(ttl=60*60, show_spinner=False)
 def get_llm_graph_data_response(user_input, model_name=DEFAULT_MODEL_CONFIG['chat_model']):
@@ -44,7 +57,7 @@ def get_llm_graph_data_response(user_input, model_name=DEFAULT_MODEL_CONFIG['cha
     
     response_data = completion.choices[0]["message"]["function_call"]["arguments"]
     # clean up the response data JSON
-    response_data = response_data.replace('  ',' ').replace(',\n }','\n }')
+    response_data = correct_json(response_data)
     # print(response_data)
 
     estimated_cost = (completion['usage']['total_tokens'] / 1000.0) *  LANG_MODEL_PRICING[state.chat_model]

@@ -176,3 +176,4 @@ cython_debug/
 /storage/index_store.json
 /storage/vector_store.json
 /db/*.sqlite3
+/NOTES.md
