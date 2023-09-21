@@ -1,0 +1,212 @@
+<!-- See: https://discuss.streamlit.io/t/code-snippet-create-components-without-any-frontend-tooling-no-react-babel-webpack-etc/13064 -->
+
+<style>
+  body {
+      background-color: lightblue;
+      /* border-color: rgb(246, 51, 102); */
+      border-width: 1px;
+      font-family: sans-serif;
+      font-size: 16px;
+  }
+  h1 {
+      font-family: sans-serif;
+      font-size: 24px;
+      font-weight: normal;
+      color: #262730;
+  }
+  #message_div {
+      font-family: sans-serif;
+      font-size: 12px;
+      font-weight: normal;
+      color: #262730;
+  }
+</style>
+
+<html>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.19.0/cytoscape.min.js"></script>
+
+  <body class="bg-gray-100">
+    <!-- Set up your HTML here -->
+    <div>
+      <textarea id="text_input" placeholder="Enter some text" rows="10" cols="50"></textarea>
+    </div>
+    <div class="container mx-auto mt-10 p-4">
+      <div id="cy" class="w-full h-screen"></div>
+    </div>
+
+    <script>
+      // ----------------------------------------------------
+      // Use these functions as is to perform required Streamlit 
+      // component lifecycle actions:
+      //
+      // 1. Signal Streamlit client that component is ready
+      // 2. Signal Streamlit client to set visible height of the component
+      //    (this is optional, in case Streamlit doesn't correctly auto-set it)
+      // 3. Pass values from component to Streamlit client
+      //
+
+      // Helper function to send type and data messages to Streamlit client
+
+      const SET_COMPONENT_VALUE = "streamlit:setComponentValue"
+      const RENDER = "streamlit:render"
+      const COMPONENT_READY = "streamlit:componentReady"
+      const SET_FRAME_HEIGHT = "streamlit:setFrameHeight"
+
+      function _sendMessage(type, data) {
+        // copy data into object
+        var outData = Object.assign({
+          isStreamlitMessage: true,
+          type: type,
+        }, data)
+
+        if (type == SET_COMPONENT_VALUE) {
+          console.log("_sendMessage data: " + JSON.stringify(data))
+          console.log("_sendMessage outData: " + JSON.stringify(outData))
+        }
+        
+        window.parent.postMessage(outData, "*")
+      }
+
+      function initialize(pipeline) {
+
+        // Hook Streamlit's message events into a simple dispatcher of pipeline handlers
+        window.addEventListener("message", (event) => {
+          if (event.data.type == RENDER) {
+            // The event.data.args dict holds any JSON-serializable value
+            // sent from the Streamlit client. It is already deserialized.
+            pipeline.forEach(handler => {
+              handler(event.data.args)
+            })
+          }
+        })
+
+        _sendMessage(COMPONENT_READY, {apiVersion: 1});
+
+        // Component should be mounted by Streamlit in an iframe, so try to autoset the iframe height.
+        window.addEventListener("load", () => {
+          window.setTimeout(function() {
+            setFrameHeight(document.documentElement.clientHeight)
+          }, 0)
+        })
+
+        // Optionally, if auto-height computation fails, you can manually set it
+        // (uncomment below)
+        // setFrameHeight(800)
+      }
+
+      function setFrameHeight(height) {
+        _sendMessage(SET_FRAME_HEIGHT, {height: height})
+      }
+
+      // The `data` argument can be any JSON-serializable value.
+      function notifyHost(data) {
+        _sendMessage(SET_COMPONENT_VALUE, data)
+      }
+
+      // ----------------------------------------------------
+      // Now implement the the custom functionality of the component:
+
+      let textArea = document.getElementById("text_input")
+      textArea.addEventListener("change", () => {
+        notifyHost({
+          value: textArea.value,
+          dataType: "json",
+        })
+      })
+
+      const calcNodeWidth = label => Math.max(50, label.length * 8) + "px";
+    
+      function createGraph(data) {
+        cytoscape({
+          container: document.getElementById('cy'),
+          elements: data.elements,
+          style: [
+          {
+            selector: 'node',
+            style: {
+                'background-color': 'data(color)',
+                'label': 'data(label)',
+                'text-valign': 'center',
+                'text-halign': 'center',
+                'shape': 'rectangle',
+                'height': '50px',
+                'width': ele => calcNodeWidth(ele.data('label')),
+                'color': function(ele) {
+                  return getTextColor(ele.data('color'));
+                },
+                'font-size': '12px'
+              }
+            },
+            {
+              selector: 'edge',
+              style: {
+                'width': 3,
+                'line-color': 'data(color)',
+                'target-arrow-color': 'data(color)',
+                'target-arrow-shape': 'triangle',
+                'label': 'data(label)',
+                'curve-style': 'unbundled-bezier',
+                'line-dash-pattern': [4, 4],
+                'text-background-color': '#ffffff',
+                'text-background-opacity': 1,
+                'text-background-shape': 'rectangle',
+                'font-size': '10px'
+              }
+            }
+          ],
+          layout: {
+            name: 'cose',
+            fit: true,
+            padding: 0,
+            avoidOverlap: true
+          } 
+        });
+      }
+  
+      function getTextColor(bgColor) {
+        bgColor = bgColor.replace('#', '');
+        const [r, g, b] = [0, 2, 4].map(start => parseInt(bgColor.substr(start, 2), 16));
+        const brightness = (r * 0.299) + (g * 0.587) + (b * 0.114);
+        return brightness < 40 ? '#ffffff' : '#000000';
+      }
+  
+      // ----------------------------------------------------
+      // Define a pipeline of inbound property handlers
+
+      // Set initial value sent from Streamlit!
+      function initializeProps_Handler(props) {
+        if (props.show_graph_data) {
+          textArea.style.visibility = 'visible'
+          if (textArea.value == "") {
+            textArea.value = JSON.stringify(props.data.graph)
+          }
+        } else {
+          textArea.style.visibility = 'hidden'
+          textArea.remove()
+        }
+      }
+      // Update graph
+      function graphUpdate_Handler(props) {
+        createGraph(props.data.graph)
+      }
+      // Simply log received data dictionary
+      function log_Handler(props) {
+        console.log("Received from Streamlit: " + JSON.stringify(props))
+      }
+
+      function adjustHeight_Handler(props) {
+        setFrameHeight(props.graph_height)
+      }
+
+      let pipeline = [initializeProps_Handler, graphUpdate_Handler, adjustHeight_Handler, log_Handler]
+
+      // ----------------------------------------------------
+      // Finally, initialize component passing in pipeline
+
+      initialize(pipeline)
+
+    </script>
+  </body>
+</html>
