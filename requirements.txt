@@ -1,9 +1,9 @@
 streamlit
-langchain
-langchain-experimental
-llama-index
-weaviate-client
-openai
+langchain==0.0.294
+langchain-experimental==0.0.18
+llama-index==0.8.29.post1
+weaviate-client==3.24.1
+openai==0.28.0
 sqlalchemy
 debugpy
 openpyxl
@@ -15,6 +15,6 @@ graphviz==0.20.1
 networkx==3.1
 beautifulsoup4==4.12.2
 colorama==0.4.5
-newspaper3k
+newspaper3k==0.2.8
 htmldate
 datefinder
