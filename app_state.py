@@ -19,28 +19,17 @@ def build_initial_state():
         print('settings OPENAI_API_KEY not found!')
         # Try get OpenAI api key from os env
         # (this is the workaround for using Streamlit in Heroku)
-        if os.environ['OPENAI_API_KEY']:
+        if os.environ.get('OPENAI_API_KEY', None):
             print('os.environ', 'OPENAI_API_KEY found')
             openai_api_key = os.environ['OPENAI_API_KEY']
             openai.api_key = os.getenv("OPENAI_API_KEY")
 
     print('openai_api_key', 'sk_...' + openai_api_key[-5:], '\n') if openai_api_key else print('openai_api_key', 'NULL', '\n')
 
-    weaviate_api_key = None
-    if st.secrets.get('WEAVIATE_API_KEY', None):
-        print('settings', 'WEAVIATE_API_KEY found')
-        weaviate_api_key = st.secrets['WEAVIATE_API_KEY']
-    else:
-        print('settings WEAVIATE_API_KEY not found!')
-        # Try get Weaviate api key from os env
-        # (this is the workaround for using Streamlit in Heroku)
-        if os.environ['WEAVIATE_API_KEY']:
-            print('os.environ', 'WEAVIATE_API_KEY found')
-            weaviate_api_key = os.environ['WEAVIATE_API_KEY']
-
+    weaviate_api_key = st.secrets.get('WEAVIATE_API_KEY', None)
     print('weaviate_api_key',  weaviate_api_key[:5] + '...' + weaviate_api_key[-5:], '\n') if weaviate_api_key else print('weaviate_api_key', 'NULL', '\n')
 
-    weaviate_cluster_url = st.secrets['WEAVIATE_CLUSTER_URL']
+    weaviate_cluster_url = st.secrets.get('WEAVIATE_CLUSTER_URL', None)
     
     initial_state = {
         # MAIN APP STATE
