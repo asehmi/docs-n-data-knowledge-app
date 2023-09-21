@@ -2,6 +2,7 @@ streamlit
 langchain==0.0.294
 langchain-experimental==0.0.18
 llama-index==0.8.29.post1
+llama-cpp-python
 weaviate-client==3.24.1
 openai==0.28.0
 sqlalchemy
