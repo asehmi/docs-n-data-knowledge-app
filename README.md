@@ -34,7 +34,7 @@ In this demo:
 
 The application can be seen running in the Streamlit Cloud at the link below:
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://asehmi-media-explorer-app-client-app-7vk2lf.streamlitapp.com/)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://docs-n-data-knowledge-app.streamlit.app/)
 
 **NOTE:** You will need to enter your own OpenAI API. The key is ephemeral and not stored permanently in the application. Once entered, the API Key input box will be hidden and you can start using the app. To re-enter the API Key, a button is provided to clear the current key from memory, after which you can re-enter another key. 
 
