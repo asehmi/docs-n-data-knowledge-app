@@ -80,12 +80,15 @@ def generate_knowledge_graph(response_data):
     for edge in response_dict.get("edges", []):
         dot.edge(edge["from"], edge["to"], label=edge["relationship"])
 
-    # Render and visualize
-    dot.render("./static/knowledge_graph.gv", view=False)
-    # Render to PNG format and save it
-    dot.render("./static/knowledge_graph", format = "png", view=False)
-
-    return "./static/knowledge_graph.png"
+    # Requires GraphViz executable, so we can't use it in Streamlit Cloud
+    if json.loads(st.secrets['IS_CLOUD_DEPLOYMENT']): 
+        return {'dot': dot, 'png': None, 'gv': None}
+    else:
+        # Render and visualize
+        dot.render("./static/knowledge_graph.gv", view=False)
+        # Render to PNG format and save it
+        dot.render("./static/knowledge_graph", format = "png", view=False)
+        return {'dot': dot, 'png': "./static/knowledge_graph.png", 'gv': "./static/knowledge_graph.gv"}
 
 def get_graph_data(response_data):
     try:
@@ -118,12 +121,13 @@ def get_graph_data(response_data):
 
 # UTILITY ---------------------------------------------------------------------
 
-def image_text_html(image, text, image_style=None, text_style=None):
+def image_html_fragments(image, text, image_style=None, text_style=None):
     with open(image, 'rb') as img_f:
         img_b64 = base64.b64encode(img_f.read()).decode('utf-8')
 
     img_style = image_style if image_style else "height: 200px; margin: 3px;"
-    image_html = f'<img src="data:image/gif;base64,{img_b64}" style="{img_style} vertical-align:middle;">'
+    image_tag_html = f'<img src="data:image/png;base64,{img_b64}" style="{img_style} vertical-align:middle;">'
+    image_download_link = f'<a download="knowledge_graph.png" href="data:image/png;base64,{img_b64}">Download</a>'
     
     # style copied from dev tools
     span_style = text_style if text_style else "font-weight: 600; font-size: 1.75rem;"
@@ -134,9 +138,9 @@ def image_text_html(image, text, image_style=None, text_style=None):
                    'position: relative; vertical-align:middle;' )
     text_html = f'<span style="{span_style}">{text}</span>'
 
-    image_text_html = f'{text_html}&nbsp;&nbsp;{image_html}'
+    image_html = f'{text_html}&nbsp;&nbsp;{image_tag_html}'
 
-    return image_text_html
+    return {'image_html': image_html, 'image_tag_html': image_tag_html, 'image_download_link': image_download_link}
 
 # MAIN ------------------------------------------------------------------------
 
@@ -163,13 +167,12 @@ def main(title, user_input_confirmed=False, response=None):
     if user_input:
         st.subheader('💡 Answer Knowledge Graph')
         # This will use cached response!
-        with st.spinner("Generating knowledge graph..."):
+        with st.spinner("Generating knowledge graph (this takes a while)..."):
             response_data = get_llm_graph_data_response(user_input, model_name=state.chat_model)
-        image = generate_knowledge_graph(response_data)
 
         c1, c2, _ = st.columns([2, 1, 3])
         with c1:
-            radio_options = ["Interactive", "Image", "Data"]
+            radio_options = ["Interactive", "Static", "Data"]
             radio_option = st.radio('Knowledge graph options', options=radio_options, horizontal=True)
         with c2:
             height = st.slider("Adjust image height", 100, 1000, 750, 50)
@@ -193,11 +196,20 @@ def main(title, user_input_confirmed=False, response=None):
             handle_event(run_component(props))
 
         if radio_option == radio_options[1]:
-            st.markdown(image_text_html(
-                image, '',
-                image_style=f"height: {height}px; margin: 5px;",
-                text_style="font-weight: 600; font-size: 1.75rem;"
-            ), unsafe_allow_html=True )
+            graph_data = generate_knowledge_graph(response_data)
+            # If graphviz executable is available, then we'll have a PNG to download or display
+            if graph_data['png']:
+                image_html_frags = image_html_fragments(
+                    graph_data['png'], '',
+                    image_style=f"height: {height}px; margin: 5px;",
+                    text_style="font-weight: 600; font-size: 1.75rem;"
+                )
+                st.markdown(f"{image_html_frags['image_download_link']}", unsafe_allow_html=True)
+                # st.markdown(f"{image_html_frags['image_tag_html']}", unsafe_allow_html=True)
+                # st.markdown(f"{image_html_frags['image_html']}", unsafe_allow_html=True)
+            
+            # Display using Streamlit's D3.js graphviz renderer
+            st.graphviz_chart(graph_data['dot'])
             
         if radio_option == radio_options[2]:
             st.json(get_graph_data(response_data), expanded=True)

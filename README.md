@@ -51,10 +51,10 @@ pip install -r requirements.txt
 **Important:** Modify the `secrets.toml` file in the application `.streamlit` root based on the example available in `secrets.toml.sample`.
 
 ```bash
-IS_CLOUD_DEPLOYMENT='true' # 'true' = deployed on st cloud | 'false' = deployed locally
 OPENAI_API_KEY='<Your OpenAI API Key>'
 WEAVIATE_API_KEY='<Your Weaviate API Key>'
 WEAVIATE_CLUSTER_URL='https://<Your Weaviate Cluster ID>.weaviate.network'
+IS_CLOUD_DEPLOYMENT='true' # 'true' = deployed on st cloud | 'false' = deployed locally
 ```
 
 In `globals.py` you can change the following variables to affect application behaviour:

@@ -37,7 +37,7 @@ SAMPLE_QUESTIONS = [
     "Build a 5-part learning plan on how to become a software architect. Detail each part with a short description and bullet points.",
     "Machine learning model training, deployment and operations",
     "What is a knowledge graph",
-    "What is a graph neural network"
+    "What is a graph neural network",
     "https://en.wikipedia.org/wiki/Graph_theory",
     "Most important factors of high performing teams",
 ]

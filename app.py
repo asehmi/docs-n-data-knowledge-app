@@ -10,8 +10,6 @@ st.set_page_config(page_title='ChatGPT Pandas CSV Streamlit App', page_icon='ðŸ¤
 from app_state import (state, init_app_state, reset_app_state, _set_state_cb)
 init_app_state() # ensure all state variables are initialized
 
-import app_llm_data_query, app_llm_docs_query, app_llm_knowlege_graph_gen, app_about
-
 from globals import SAMPLE_QUESTIONS
 
 logging.basicConfig(level=logging.INFO)
@@ -53,11 +51,13 @@ def _openai_api_key_guard():
             )
             st.stop()
 
+# Guardrail for API Key
+_openai_api_key_guard()
+
+# Once past the guardrails, import the rest of the app whihc depends on OpenAI API key
+import app_llm_data_query, app_llm_docs_query, app_llm_knowlege_graph_gen, app_about
+
 def start():
-
-    # Guardrail for API Key
-    _openai_api_key_guard()
-
     # Sidebar
     with st.sidebar:
         st.image('./images/a12i_logo_circle_transparent.png')

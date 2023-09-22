@@ -28,12 +28,14 @@ from common import scrape_articles
 
 # DOCS CHAT PAGE ----------------------------------------------------------------
 
-auth_config = weaviate.AuthApiKey(api_key=state.weaviate_api_key)
-wc = weaviate.Client(
-    url=state.weaviate_cluster_url,
-    auth_client_secret=auth_config
-)
-
+wc = None
+# WEAVIATE CLOUD STORE
+if VECTOR_STORE == 'Weaviate':
+    auth_config = weaviate.AuthApiKey(api_key=state.weaviate_api_key)
+    wc = weaviate.Client(
+        url=state.weaviate_cluster_url,
+        auth_client_secret=auth_config
+    )
 
 @st.cache_data(ttl=60*60, show_spinner=False)
 def get_llm_doc_query_response(
