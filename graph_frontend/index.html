@@ -30,6 +30,7 @@
   <body class="bg-gray-100">
     <!-- Set up your HTML here -->
     <div>
+      <!-- Am not going to use this input... it's only for testing the Streamlit host component handler -->
       <textarea id="text_input" placeholder="Enter some text" rows="10" cols="50"></textarea>
     </div>
     <div class="container mx-auto mt-10 p-4">
@@ -38,8 +39,8 @@
 
     <script>
       // ----------------------------------------------------
-      // Use these functions as is to perform required Streamlit 
-      // component lifecycle actions:
+      // Use these functions as is to perform the required  
+      // Streamlit component lifecycle actions:
       //
       // 1. Signal Streamlit client that component is ready
       // 2. Signal Streamlit client to set visible height of the component
@@ -106,7 +107,7 @@
       }
 
       // ----------------------------------------------------
-      // Now implement the the custom functionality of the component:
+      // Now implement the custom functionality of the component:
 
       let textArea = document.getElementById("text_input")
       textArea.addEventListener("change", () => {

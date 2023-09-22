@@ -54,7 +54,7 @@ def _openai_api_key_guard():
 # Guardrail for API Key
 _openai_api_key_guard()
 
-# Once past the guardrails, import the rest of the app whihc depends on OpenAI API key
+# Once past the guardrails, import the rest of the app which depends on OpenAI API key
 import app_llm_data_query, app_llm_docs_query, app_llm_knowlege_graph_gen, app_about
 
 def start():

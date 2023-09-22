@@ -106,6 +106,8 @@ def scrape_articles(source_urls):
             {'title':article_titles, 'author':article_authors, 'date':article_dates, \
              'text':article_texts, 'keywords':article_keywords, 'summary':article_summaries, \
              'url':article_urls }
+            
+        # NOTE: Could use this dict object to return a Pandas dataframe instead!
         
         return articles_dict
 
@@ -120,7 +122,7 @@ def scrape_articles(source_urls):
         if count > 5:
             break
         '''
-        # Use variable sleep betwen calls (good netizenship!)
+        # Use a variable sleep betwen calls (good netizenship!)
         t = random.choice([0.1, 0.25, 0.5, 0.75, 1., 1.1, 1.25, 1.5])
         jitter = random.random()
         T = t + jitter
@@ -134,11 +136,11 @@ def scrape_articles(source_urls):
 
     return articles_dict
 
-# if newspaper can't find, then use is bs4, datafinder, htmldate
+# if newspaper can't find, then use bs4, datafinder, htmldate
 def alternative_get_publish_date(article):
     # try bs4
     soup = BeautifulSoup(article.html, features="lxml")
-    # class=newsdate is specific to 'Balfour Beatty' press releases
+    # class=newsdate is specific to one site I was scraping (you can change this to suit your needs)
     para = soup.find('p', attrs={'class': 'newsdate'})
     if para:
         datetime_obj = parse_date_str(para.next)
@@ -175,11 +177,11 @@ def parse_date_str(date_str):
 #
 # NOTE: (@asehmi) It has been modified to preserve the format strings if fp's
 # value is None, which is important when a prompt template is being
-# incrementally built up (e.g. see prompts_admin.py. Templates are generated,
-# and parameter subsitutions are put into a database, Airtable for now, and
-# then they're retrieved and used to build the final prompt by binding with
-# the doc input and topic classification options, for example.) There is also
-# a mod to deal with embedded JSON strings which contain braces.
+# incrementally built up (e.g. say templates are generated from parts 
+# and they use parameter subsitutions taken from a database, and
+# then they're used to build the final prompt by binding with
+# the doc input, etc.) There is also a mod to deal with embedded
+# JSON strings which contain braces.
 #
 import string
 class SafeFormatter(string.Formatter):

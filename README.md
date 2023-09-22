@@ -4,7 +4,7 @@
 
 > Arvindra Sehmi, A12i (CloudOpti Ltd.) | [LinkedIn](https://www.linkedin.com/in/asehmi/)
 
-> Updated: 21 September, 2023
+> Updated: 22 September, 2023
 
 ---
 
