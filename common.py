@@ -129,7 +129,7 @@ def scrape_articles(source_urls):
         time.sleep(T)
 
         try:
-            _newspaper_scraper_helper(url)
+            _newspaper_scraper_helper(url.strip())
         except Exception as e:
             print('!!Newspaper Exception!!', '\n', e)
             continue

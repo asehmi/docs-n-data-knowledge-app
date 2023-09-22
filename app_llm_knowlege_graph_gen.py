@@ -22,6 +22,9 @@ def correct_json(response_data):
     """
     Corrects the JSON response from OpenAI to be valid JSON
     """
+    # clean up the response data JSON
+    response_data = response_data.replace('  ',' ').replace(',\n }','\n }')
+    # For good measure
     response_data = re.sub(
         r',\s*}', '}', re.sub(
         r',\s*]', ']', re.sub(
@@ -157,11 +160,11 @@ def main(title, user_input_confirmed=False, response=None):
         )
 
     # GPT chat models can handle web sites, so we can keep URLs in the user input
-    user_input = state.user_input if state.user_input.startswith('http') else response
+    user_input = state.user_input if state.user_input.strip().startswith('http') else response
     user_input = user_input.replace('\n', ' ').replace('\r', '') if user_input else user_input
 
     if user_input_confirmed and user_input:
-        with st.spinner("Generating knowledge graph..."):
+        with st.spinner("Generating knowledge graph (this takes a while)..."):
             response_data = get_llm_graph_data_response(user_input, model_name=state.chat_model)
 
     if user_input:

@@ -109,7 +109,7 @@ def main(title, user_input_confirmed=False):
         st.markdown(f'#### {title} Settings')
         st.selectbox(
             'OpenAI model', options=OPENAI_MODELS_COMPLETIONS,
-            on_change=_set_state_cb(chat_model='selectbox_docs_completions_model_name'),
+            on_change=_set_state_cb(completions_model='selectbox_docs_completions_model_name'),
             index=OPENAI_MODELS_COMPLETIONS.index(state.completions_model),
             help='Allowed models. Accuracy, speed, token consumption and costs will vary.',
             key='selectbox_docs_completions_model_name'
@@ -124,8 +124,11 @@ def main(title, user_input_confirmed=False):
                 _index_documents()
 
     # GPT completion models can not handle web sites, so we scrape the URL in the user input
-    user_input = scrape_articles([state.user_input])['text'][0] if state.user_input.startswith('http') else state.user_input
-    user_input = user_input.replace('\n', ' ').replace('\r', '') if user_input else user_input
+    user_input = state.user_input
+    if user_input.strip().startswith('http'):
+        scraped_texts = scrape_articles([user_input])['text']
+        user_input = scraped_texts[0] if scraped_texts else user_input
+        user_input = user_input.replace('\n', ' ').replace('\r', '') if user_input else user_input
 
     if include_history:
         context = '\n\n'.join([f'| Question: "{q}" | Answer: "{a}" |' for q, a in zip(state.questions, state.past)])

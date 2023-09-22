@@ -87,6 +87,8 @@ Now run Streamlit with `app.py`:
 streamlit run --server.port 4010 app.py
 ```
 
+**NOTE:** Whilst there is some clean-up of the structured data expected in the LLM responses, LLMs don't always return data you expect. You might therefore encounter errors. If you do, try changing the LLM model selected and re-run your queries.
+
 ### TODO
 
 - Possibly, remove the data page functionality from app and create a separate project for it

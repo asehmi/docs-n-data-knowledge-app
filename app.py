@@ -97,6 +97,7 @@ def start():
 
         with c3:
             user_input_confirmed = False
+            include_knowledge_graph = False
             radio_options = [user_input, example_selection] if user_input and (user_input != example_selection) else ([example_selection] if example_selection != "None" else [])
             if radio_options:
                 st.markdown('### **2️⃣ Confirm your question**')
@@ -108,16 +109,21 @@ def start():
                         horizontal=True,
                         key="confirm_input"
                     )
-                    user_input_confirmed = st.form_submit_button(
-                        label="Confirm", type='primary',
-                        on_click=_set_state_cb(
-                            estimated_cost_doc='estimated_cost_reset',
-                            estimated_cost_graph='estimated_cost_reset',
+                    c1, c2, _ = st.columns([1, 1, 1.5])
+                    with c1:
+                        user_input_confirmed = st.form_submit_button(
+                            label="Confirm and get answer", type='primary',
+                            on_click=_set_state_cb(
+                                estimated_cost_doc='estimated_cost_reset',
+                                estimated_cost_graph='estimated_cost_reset',
+                            )
                         )
-                    )
+                    with c2:
+                        include_knowledge_graph = st.checkbox('Include knowledge graph', value=False)
 
         if state.user_input:
             st.markdown(f'###### ✅ Confirmed question: _{state.user_input}_')
+            st.markdown(f'###### ✅ Include knowledge graph: _{include_knowledge_graph}_')
         else:
             st.markdown('###### ❌ No question confirmed yet')
         
@@ -127,7 +133,8 @@ def start():
         with c1:
             response = app_llm_docs_query.main('Document Q&A', user_input_confirmed)
         with c3:
-            app_llm_knowlege_graph_gen.main('Knowledge Graph', user_input_confirmed, response)
+            if include_knowledge_graph:
+                app_llm_knowlege_graph_gen.main('Knowledge Graph', user_input_confirmed, response)
 
     # Simple Excel Data Q&A
     if top_level == top_level_options[1]:
