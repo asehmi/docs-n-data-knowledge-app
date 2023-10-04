@@ -29,13 +29,13 @@ def build_initial_state():
     weaviate_api_key = st.secrets.get('WEAVIATE_API_KEY', None)
     print('weaviate_api_key',  weaviate_api_key[:5] + '...' + weaviate_api_key[-5:], '\n') if weaviate_api_key else print('weaviate_api_key', 'NULL', '\n')
 
-    weaviate_cluster_url = st.secrets.get('WEAVIATE_CLUSTER_URL', None)
+    WEAVIATE_URL = st.secrets.get('WEAVIATE_URL', None)
     
     initial_state = {
         # MAIN APP STATE
         'openai_api_key': openai_api_key,
         'weaviate_api_key': weaviate_api_key,
-        'weaviate_cluster_url': weaviate_cluster_url,
+        'WEAVIATE_URL': WEAVIATE_URL,
         'menu_choice': 0,
     
         # DATA PAGE STATE

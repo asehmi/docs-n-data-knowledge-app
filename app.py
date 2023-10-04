@@ -6,6 +6,9 @@ import streamlit_debug
 streamlit_debug.set(flag=True, wait_for_client=False, host='localhost', port=7777)
 
 st.set_page_config(page_title='ChatGPT Pandas CSV Streamlit App', page_icon='🤖', initial_sidebar_state='expanded', layout='wide')
+# Remove blank space between top of page and content
+st.markdown("<style>div[data-testid='stSidebarUserContent'] { padding-top: 1rem; }</style>", unsafe_allow_html=True)
+st.markdown("<style>div[data-testid='block-container'] { padding-top: 1rem; }</style> ", unsafe_allow_html=True)
 
 from app_state import (state, init_app_state, reset_app_state, _set_state_cb)
 init_app_state() # ensure all state variables are initialized

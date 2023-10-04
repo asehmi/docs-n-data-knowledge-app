@@ -33,8 +33,11 @@ wc = None
 if VECTOR_STORE == 'Weaviate':
     auth_config = weaviate.AuthApiKey(api_key=state.weaviate_api_key)
     wc = weaviate.Client(
-        url=state.weaviate_cluster_url,
-        auth_client_secret=auth_config
+        url=state.WEAVIATE_URL,
+        auth_client_secret=auth_config,
+        additional_headers={
+            "X-OpenAI-Api-Key": state.openai_api_key,
+        }
     )
 
 @st.cache_data(ttl=60*60, show_spinner=False)
@@ -89,6 +92,16 @@ def main(title, user_input_confirmed=False):
 
         # WEAVIATE CLOUD STORE
         elif VECTOR_STORE == 'Weaviate':
+            wc.schema.delete_class("Documents")
+            class_obj = {
+                "class": "Documents",
+                "vectorizer": "text2vec-openai",
+                "moduleConfig": {
+                    "text2vec-openai": {},
+                    "generative-openai": {}
+                }
+            }
+            wc.schema.create_class(class_obj)
             # chunk up the documents into nodes 
             parser = SimpleNodeParser.from_defaults(chunk_size=1024, chunk_overlap=20)
             nodes = parser.get_nodes_from_documents(documents, show_progress=True)
