@@ -4,7 +4,7 @@
 
 > Arvindra Sehmi, A12i (CloudOpti Ltd.) | [LinkedIn](https://www.linkedin.com/in/asehmi/)
 
-> Updated: 4 October, 2023
+> Updated: 9 December, 2023
 
 ---
 
@@ -12,7 +12,7 @@
 
 I built this app because I'm writing some chapters for an upcoming book on Streamlit. This app helps me digest a large quantity of information from articles and documents I have on the subject of Software Architecture. I wanted to be able to ask questions about the documents and get answers, and also to visualize the answers in a knowledge graph. I also wanted to upload Excel files and ask questions about the data in the files.
 
-The application is a typical LLM application, with the addition of a knowledge graph visualization. The app is built in Python using Streamlit. I was inspired by [instagraph](https://github.com/yoheinakajima/instagraph) and re-implemented its graph plot as a Streamlit custom component. I use the Weaviate Cloud (vector) Store (WCS) for document and data indexing. OpenAI, LangChain, and LlamaIndex LLM programming frameworks play an important role too. The application supports local filestore indexing in addition to WCS. OpenAI embeddings are used and the OpenAI API is called, directly or via the other LLM frameworks, for question answering. Hence, you will need an OpenAI API key to use the application. Various LLM models are used for question answering, including the GPT-3.5 Turbo and GPT-4 models. Both their chat and completions variants are used. Token usage is tracked and costs are estimated.
+The application is a typical LLM application, with the addition of a knowledge graph visualization. The app is built in Python using Streamlit. I was inspired by [instagraph](https://github.com/yoheinakajima/instagraph) and re-implemented its graph plot as a Streamlit custom component. I use the Weaviate Cloud (vector) Store (WCS) for document and data indexing. OpenAI, LangChain, and LlamaIndex LLM programming frameworks play an important role too. The application supports local filestore indexing in addition to WCS. OpenAI embeddings are used and the OpenAI API is called, directly or via the other LLM frameworks, for question answering. Hence, you will need an OpenAI API key to use the application. Various LLM models are used for question answering, including the GPT-4-Turbo Turbo and GPT-4 models. They are used for bot chat and completions. Token usage is tracked and costs are estimated.
 
 The application is deployed on Streamlit Cloud. When deployed in the cloud, the application uses WCS. When deployed locally, the application can be configured to use LlamaIndex to store its index in the local file system.
 
@@ -60,10 +60,14 @@ IS_CLOUD_DEPLOYMENT='true' # 'true' = deployed on st cloud | 'false' = deployed 
 In `globals.py` you can change the following variables to affect application behaviour:
 
 ```python
+# See: https://openai.com/pricing
 LANG_MODEL_PRICING = {
-    'gpt-3.5-turbo-16k': 0.003,     # per 1000 tokens
-    'gpt-4': 0.03,                  # per 1000 tokens
-    'gpt-3.5-turbo-instruct': 0.02, # per 1000 tokens
+    # Friendly aliases used in app
+    'gpt-4': {'input': 0.03, 'output': 0.06},                       # per 1000 tokens
+    'gpt-4-turbo': {'input': 0.01, 'output': 0.03},                 # per 1000 tokens
+    # Actual model names used in app
+    'gpt-4-1106-preview': {'input': 0.01, 'output': 0.03},          # per 1000 tokens
+    'gpt-3.5-turbo-instruct': {'input': 0.0015, 'output': 0.002},   # per 1000 tokens
 }
 
 VECTOR_STORE = 'Weaviate' # 'Weaviate' | 'Local'

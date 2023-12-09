@@ -1,5 +1,6 @@
 {
     "git.ignoreLimitWarning": true,
     "docwriter.style": "Auto-detect",
-    "python.analysis.typeCheckingMode": "off"
+    "python.analysis.typeCheckingMode": "off",
+    "python.defaultInterpreterPath": "C:\\ProgramData\\Anaconda3\\python.exe",
 }

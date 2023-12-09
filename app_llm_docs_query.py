@@ -1,6 +1,6 @@
 import json
 
-from langchain import PromptTemplate
+from langchain.prompts import PromptTemplate
 
 import tiktoken
 from llama_index.callbacks import CallbackManager, TokenCountingHandler
@@ -11,8 +11,6 @@ from llama_index import (
     StorageContext, ServiceContext, 
     load_index_from_storage
 )
-from llama_index.text_splitter.sentence_splitter import SentenceSplitter
-
 import weaviate
 
 import streamlit as st
@@ -194,7 +192,8 @@ def main(title, user_input_confirmed=False):
         with st.expander('View conversation history', expanded=False):
             st.markdown('\n\n'.join([f'---\n**Question**\n\n{q}\n\n**Answer**\n\n{a}' for q, a in zip(state.questions, state.past)]))
             
-        estimated_cost = (token_counter.total_llm_token_count / 1000.0) * LANG_MODEL_PRICING[state.completions_model]
+        estimated_cost = ((token_counter.prompt_llm_token_count / 1000.0) * LANG_MODEL_PRICING[state.completions_model]['input']) + \
+            ((token_counter.completion_llm_token_count / 1000.0) * LANG_MODEL_PRICING[state.completions_model]['output'])
         print('Document Q&A Estimated Cost: $', estimated_cost)
         state.estimated_cost_doc = estimated_cost
         state.cumulative_cost += estimated_cost

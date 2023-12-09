@@ -13,6 +13,22 @@
             "args": []
         },
         {
+            "name": "Python Streamlit",
+            "type": "python",
+            "request": "launch",
+            "module": "streamlit",
+            "args": ["run", "${file}", "--server.port", "6974"],
+            "justMyCode": true,
+            "redirectOutput": true,
+            "logToFile": true,
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "."
+                }
+            ]
+        },
+        {
             "name": "Python: debugpy Remote Attach",
             "type": "python",
             "request": "attach",

@@ -45,25 +45,26 @@ def get_llm_graph_data_response(user_input, model_name=DEFAULT_MODEL_CONFIG['cha
             'top_p': state.top_p,
             'max_tokens': state.max_tokens,
         }
-        completion = openai.ChatCompletion.create(
+        completion = openai.chat.completions.create(
             messages=json.loads(SafeFormatter().format(json.dumps(func_prompt.MESSAGES), user_input=user_input)),
             functions=func_prompt.FUNCTIONS,
             function_call=func_prompt.FUNCTION_CALL,
             **model_config
         )
-    except openai.error.RateLimitError as e:
+    except openai.RateLimitError as e:
         # request limit exceeded or something.
         return str(e)
     except Exception as e:
         # general exception handling
         return str(e)
     
-    response_data = completion.choices[0]["message"]["function_call"]["arguments"]
+    response_data = completion.choices[0].message.function_call.arguments
     # clean up the response data JSON
     response_data = correct_json(response_data)
     # print(response_data)
 
-    estimated_cost = (completion['usage']['total_tokens'] / 1000.0) *  LANG_MODEL_PRICING[state.chat_model]
+    estimated_cost = ((completion.usage.prompt_tokens / 1000.0) * LANG_MODEL_PRICING[state.chat_model]['input']) + \
+        ((completion.usage.completion_tokens / 1000.0) * LANG_MODEL_PRICING[state.chat_model]['output'])
     print('Knowledge Graph Generation Estimated Cost: $', estimated_cost)
     state.estimated_cost_graph = estimated_cost
     state.cumulative_cost += estimated_cost

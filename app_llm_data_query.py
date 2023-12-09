@@ -4,7 +4,7 @@ import pandas as pd
 # from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
 from langchain.callbacks import get_openai_callback
-from langchain import OpenAI
+from langchain.llms import OpenAI
 from langchain.utilities.sql_database import SQLDatabase
 from langchain_experimental.sql import SQLDatabaseChain
 
@@ -72,7 +72,7 @@ def sql_database(table):
 # create OpenAI LLM connection
 # NOTE: relies on environment key in case you want to
 # remove entering the key in the app
-@st.cache_data()
+# @st.cache_data()
 def get_llm(
     model_name: str = DEFAULT_MODEL_CONFIG['completions_model'],
     temperature: float = DEFAULT_MODEL_CONFIG['temperature'],
@@ -92,7 +92,7 @@ def get_llm(
     )
 
 # include model name in cache key in case it is changed by the user
-@st.cache_data()
+# @st.cache_data()
 def get_llm_data_query_response(query, table, model_name=DEFAULT_MODEL_CONFIG['completions_model'], intermediate_steps=False, limit=3):
     model_config = {
         'model_name': model_name,
@@ -123,7 +123,8 @@ def get_llm_data_query_response(query, table, model_name=DEFAULT_MODEL_CONFIG['c
           'LLM Completion Tokens:', token_counter.completion_tokens, '\n',
           'Total LLM Token Count:', token_counter.total_tokens)
 
-    estimated_cost = (token_counter.total_tokens / 1000.0) * LANG_MODEL_PRICING[state.completions_model]
+    estimated_cost = ((token_counter.prompt_tokens / 1000.0) * LANG_MODEL_PRICING[state.completions_model]['input']) + \
+        ((token_counter.completion_tokens / 1000.0) * LANG_MODEL_PRICING[state.completions_model]['output'])
     print('Data SQL Query Estimated Cost: $', estimated_cost)
     state.estimated_cost_data = estimated_cost
     state.cumulative_cost += estimated_cost
