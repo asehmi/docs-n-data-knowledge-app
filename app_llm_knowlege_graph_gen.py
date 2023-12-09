@@ -154,7 +154,7 @@ def main(title, user_input_confirmed=False, response=None):
         st.markdown(f'#### {title} Settings')
         st.selectbox(
             'OpenAI model', options=OPENAI_MODELS_CHAT,
-            on_change=_set_state_cb(chat_model='selectbox_graph_chat_model_name'),
+            on_change=_set_state_cb, kwargs={'chat_model': 'selectbox_graph_chat_model_name'},
             index=OPENAI_MODELS_CHAT.index(state.chat_model),
             help='Allowed models. Accuracy, speed, token consumption and costs will vary.',
             key='selectbox_graph_chat_model_name'

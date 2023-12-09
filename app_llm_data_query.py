@@ -7,6 +7,10 @@ from langchain.callbacks import get_openai_callback
 from langchain.llms import OpenAI
 from langchain.utilities.sql_database import SQLDatabase
 from langchain_experimental.sql import SQLDatabaseChain
+import retry
+import logging
+
+logging.basicConfig(level=logging.ERROR)
 
 import streamlit as st
 
@@ -72,7 +76,6 @@ def sql_database(table):
 # create OpenAI LLM connection
 # NOTE: relies on environment key in case you want to
 # remove entering the key in the app
-# @st.cache_data()
 def get_llm(
     model_name: str = DEFAULT_MODEL_CONFIG['completions_model'],
     temperature: float = DEFAULT_MODEL_CONFIG['temperature'],
@@ -91,14 +94,13 @@ def get_llm(
         streaming=streaming,
     )
 
-# include model name in cache key in case it is changed by the user
-# @st.cache_data()
+@retry.retry(tries=2, delay=5, backoff=3, jitter=(1, 5), max_delay=60, logger=logging.getLogger("LLM DATA QUERY (get_llm_data_query_response)"))
 def get_llm_data_query_response(query, table, model_name=DEFAULT_MODEL_CONFIG['completions_model'], intermediate_steps=False, limit=3):
     model_config = {
         'model_name': model_name,
         'temperature': 0,      # override settings = do not halucinate!
         'top_p': state.top_p,
-        'max_tokens': 300,     # override settings
+        'max_tokens': 2000,    # override settings
     }
     llm = get_llm(**model_config)
     
@@ -139,7 +141,7 @@ def main(title):
         st.markdown(f'#### {title} Settings')
         st.selectbox(
             'OpenAI model', options=OPENAI_MODELS_COMPLETIONS,
-            on_change=_set_state_cb(completions_model='selectbox_data_completions_model_name'),
+            on_change=_set_state_cb, kwargs={'completions_model': 'selectbox_data_completions_model_name'},
             index=OPENAI_MODELS_COMPLETIONS.index(state.completions_model),
             help='Allowed models. Accuracy, speed, token consumption and costs will vary.',
             key='selectbox_data_completions_model_name'
@@ -147,7 +149,7 @@ def main(title):
         # results limit
         st.number_input(
             'Results limit', value=state.limit, min_value=1, max_value=10, step=1,
-            on_change=_set_state_cb(limit='number_input_limit'),
+            on_change=_set_state_cb, kwargs={'limit': 'number_input_limit'},
             help='Limit the number of results returned, which can improve performance and save OpenAI costs',
             key='number_input_limit'
         )
@@ -177,25 +179,24 @@ def main(title):
         # user query
         st.text_input(
             'Enter a data query in plain English', value=state.query,
-            help='Enter a question based on the uploaded dataset. Add as much detail as you like.',
-            on_change=_set_state_cb(query='text_input_query_data'),
+            help='Enter a question based on the uploaded dataset. Add as much detail as you like. '
+            'E.g., "What is X of Y in the table. Limit to 10 results, and format as JSON showing X and Y values only."',
             key='text_input_query_data'
         )
         st.checkbox(
             'Show Intermediate Steps', value=state.intermediate_steps, 
-            on_change=_set_state_cb(intermediate_steps='checkbox_intermediate_steps'),
             key='checkbox_intermediate_steps'
         )
         apply_query = st.form_submit_button(
             label='Ask', type='primary',
-            on_click=_set_state_cb(
-                intermediate_steps='checkbox_intermediate_steps',
-                query='text_input_query_data',
-                estimated_cost_data='estimated_cost_reset',
-            ),
+            on_click=_set_state_cb, kwargs={
+                'intermediate_steps': 'checkbox_intermediate_steps',
+                'query': 'text_input_query_data',
+                'estimated_cost_data': 'estimated_cost_reset',
+            },
         )
 
-    if apply_query and state.openai_api_key:
+    if apply_query and state.query and state.openai_api_key:
         query = state.query + f' Strictly use only these data columns "{list(data.columns)}". ' + \
             'Do not wrap the SQL statement in quotes. Do not embelish the answer with any additional text.'
         result = get_llm_data_query_response(
@@ -211,3 +212,5 @@ def main(title):
             st.text(result['result'])
         else:
             st.text(result)
+    elif apply_query and not state.query:
+        st.info('Please enter a query above.')

@@ -120,7 +120,7 @@ def main(title, user_input_confirmed=False):
         st.markdown(f'#### {title} Settings')
         st.selectbox(
             'OpenAI model', options=OPENAI_MODELS_COMPLETIONS,
-            on_change=_set_state_cb(completions_model='selectbox_docs_completions_model_name'),
+            on_change=_set_state_cb, kwargs={'completions_model': 'selectbox_docs_completions_model_name'},
             index=OPENAI_MODELS_COMPLETIONS.index(state.completions_model),
             help='Allowed models. Accuracy, speed, token consumption and costs will vary.',
             key='selectbox_docs_completions_model_name'

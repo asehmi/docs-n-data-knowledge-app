@@ -107,7 +107,6 @@ def start():
                 with st.form(key="confirm_input_form"):
                     st.radio(
                         "Confirm input", options=radio_options,
-                        on_change=_set_state_cb(user_input="confirm_input"),
                         label_visibility="collapsed",
                         horizontal=True,
                         key="confirm_input"
@@ -116,10 +115,11 @@ def start():
                     with c1:
                         user_input_confirmed = st.form_submit_button(
                             label="Confirm and get answer", type='primary',
-                            on_click=_set_state_cb(
-                                estimated_cost_doc='estimated_cost_reset',
-                                estimated_cost_graph='estimated_cost_reset',
-                            )
+                            on_click=_set_state_cb, kwargs={
+                                'user_input': "confirm_input",
+                                'estimated_cost_doc': 'estimated_cost_reset',
+                                'estimated_cost_graph': 'estimated_cost_reset',
+                            }
                         )
                     with c2:
                         include_knowledge_graph = st.checkbox('Include knowledge graph', value=False)

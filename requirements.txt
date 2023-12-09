@@ -19,3 +19,4 @@ colorama==0.4.5
 newspaper3k==0.2.8
 htmldate
 datefinder
+retry

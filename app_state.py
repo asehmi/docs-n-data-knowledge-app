@@ -84,5 +84,6 @@ def reset_app_state():
 # generic callback to set state
 def _set_state_cb(**kwargs):
     for state_key, widget_key in kwargs.items():
-        if state.get(widget_key, None):
+        val = state.get(widget_key, None)
+        if val is not None or val == "":
             setattr(state, state_key, state[widget_key])
