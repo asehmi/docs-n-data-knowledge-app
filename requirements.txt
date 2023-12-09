@@ -4,7 +4,7 @@ llama-index==0.9.13
 llama-cpp-python
 sentence_transformers
 weaviate-client==3.24.1
-openai==0.28.0
+openai==1.1.2
 sqlalchemy
 debugpy
 openpyxl
